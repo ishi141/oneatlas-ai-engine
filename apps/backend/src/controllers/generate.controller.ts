@@ -26,34 +26,53 @@ export async function generateApp(
       prompt
     );
 
-    const result =
-      await generatePipeline(
-        prompt,
-        jobId
-      );
-
-    jobStore.complete(
-      jobId,
-      result
-    );
-
-    return res.json({
+    // 🔥 Return immediately
+    res.status(202).json({
       success: true,
       jobId,
-      data: result,
     });
+
+    // 🔥 Run pipeline in background
+    generatePipeline(prompt, jobId)
+      .then((result) => {
+
+        jobStore.complete(
+          jobId,
+          result
+        );
+
+      })
+      .catch((error) => {
+
+        console.error(error);
+
+        if (jobStore.fail) {
+          jobStore.fail(
+            jobId,
+            error instanceof Error
+              ? error.message
+              : "Pipeline failed"
+          );
+        }
+
+      });
 
   } catch (error) {
 
     console.error(error);
 
-    return res.status(500).json({
-      success: false,
-      message:
-        error instanceof Error
-          ? error.message
-          : "Internal Server Error",
-    });
+    if (!res.headersSent) {
+
+      return res.status(500).json({
+        success: false,
+        message:
+          error instanceof Error
+            ? error.message
+            : "Internal Server Error",
+      });
+
+    }
 
   }
+
 }

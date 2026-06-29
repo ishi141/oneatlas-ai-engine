@@ -1,36 +1,46 @@
 import {
-LLMProvider,
-LLMRequest,
-LLMResponse
-}
-from "./types.js";
+  LLMProvider,
+  LLMRequest,
+  LLMResponse,
+} from "./types.js";
 
 export async function executeWithFallback(
+  providers: LLMProvider[],
+  request: LLMRequest
+): Promise<LLMResponse> {
 
-providers:LLMProvider[],
+  let lastError: unknown;
 
-request:LLMRequest
+  for (const provider of providers) {
 
-):Promise<LLMResponse>{
+    try {
 
-let last;
+      console.log(
+        `Trying provider: ${provider.provider}`
+      );
 
-for(const provider of providers){
+      const response =
+        await provider.generate(request);
 
-try{
+      console.log(
+        `Success: ${provider.provider}`
+      );
 
-return await provider.generate(request);
+      return response;
 
-}
+    }
 
-catch(err){
+    catch (err) {
 
-last=err;
+      console.warn(
+        `Provider ${provider.provider} failed`
+      );
 
-}
+      lastError = err;
 
-}
+    }
 
-throw last;
+  }
 
+  throw lastError;
 }

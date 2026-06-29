@@ -8,7 +8,8 @@ import { generateWorkflows }
 
 import { costService } from "../../cost/cost.service.js";
 
-import { getProvider } from "../../gateway/router.js";
+import { getProviders } from "../../gateway/router.js";
+import { executeWithFallback } from "../../gateway/fallback.js";
 
 import { parseLLMJson } from "../../utils/json.js";
 
@@ -31,16 +32,16 @@ export class AppSpecStage {
   readonly name = "AppSpec Generation";
 
   async execute(
-  schema: DataSchema,
-  jobId?: string
-) {
+    schema: DataSchema,
+    jobId?: string
+  ) {
 
     console.log(
       "========== AppSpec Generation =========="
     );
 
-    const provider =
-      getProvider("appspec");
+    const providers =
+      getProviders("appspec");
 
     const defaults: AppSpec = {
 
@@ -86,10 +87,12 @@ export class AppSpecStage {
 
     };
 
-    const response = await retry(() =>
-      provider.generate({
+    const response =
+      await executeWithFallback(
+        providers,
+        {
 
-        systemPrompt: `
+          systemPrompt: `
 
 You generate production-grade application specifications.
 
@@ -103,25 +106,29 @@ Never explain.
 
 `,
 
-        userPrompt:
-          buildAppSpecPrompt(schema),
+          userPrompt:
+            buildAppSpecPrompt(schema),
 
-        temperature: 0,
+          temperature: 0,
 
-        maxTokens: 8000,
+          maxTokens: 8000,
 
-      })
-    );
+        }
+      );
 
-    costService.record(
-      jobId ?? "global",
-      "appspec",
-      response.provider,
-      response.model,
-      response.latency,
-      buildAppSpecPrompt(schema),
-      response.output
-    );
+    if (jobId) {
+
+  costService.record(
+    jobId,
+    "appspec",
+    response.provider,
+    response.model,
+    response.latency,
+    buildAppSpecPrompt(schema),
+    response.output
+  );
+
+}
 
     console.log(
       `Provider : ${response.provider}`

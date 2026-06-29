@@ -6,7 +6,9 @@ import { repairIntent } from "./intent.repair.js";
 
 import { costService } from "../../cost/cost.service.js";
 
-import { getProvider } from "../../gateway/router.js";
+import { getProviders } from "../../gateway/router.js";
+import { executeWithFallback } from "../../gateway/fallback.js";
+
 import { parseLLMJson } from "../../utils/json.js";
 
 import { retry } from "../../repair/retry.service.js";
@@ -27,8 +29,8 @@ export class IntentStage {
       "========== Intent Extraction =========="
     );
 
-    const provider =
-      getProvider("intent");
+    const providers =
+      getProviders("intent");
 
     const defaults: AppIntent = {
 
@@ -52,29 +54,37 @@ export class IntentStage {
 
     };
 
-    const response = await retry(() =>
-      provider.generate({
-        systemPrompt:
-          "You are a senior software architect. Return ONLY valid JSON. Never use markdown.",
+    const response =
+      await executeWithFallback(
+        providers,
+        {
 
-        userPrompt:
-          buildIntentPrompt(prompt),
+          systemPrompt:
+            "You are a senior software architect. Return ONLY valid JSON. Never use markdown.",
 
-        temperature: 0.2,
+          userPrompt:
+            buildIntentPrompt(prompt),
 
-        maxTokens: 2000,
-      })
-    );
+          temperature: 0.2,
 
-    costService.record(
-      jobId ?? "global",
-      "intent",
-      response.provider,
-      response.model,
-      response.latency,
-      buildIntentPrompt(prompt),
-      response.output
-    );
+          maxTokens: 2000,
+
+        }
+      );
+
+    if (jobId) {
+
+  costService.record(
+    jobId,
+    "intent",
+    response.provider,
+    response.model,
+    response.latency,
+    buildIntentPrompt(prompt),
+    response.output
+  );
+
+}
 
     console.log(
       `Provider : ${response.provider}`

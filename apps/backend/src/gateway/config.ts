@@ -12,7 +12,7 @@ export const ROUTING_CONFIG: Record<
 
     primary: "groq",
 
-    fallback: "openai"
+    fallback: "openai",
 
   },
 
@@ -20,16 +20,16 @@ export const ROUTING_CONFIG: Record<
 
     primary: "openai",
 
-    fallback: "anthropic"
+    fallback: "anthropic",
 
   },
 
   appspec: {
 
-    primary: "openai",
+    primary: "gemini",
 
-    fallback: "groq"
+    fallback: "openrouter",
 
-  }
+  },
 
 };

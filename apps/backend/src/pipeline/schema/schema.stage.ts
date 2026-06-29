@@ -3,7 +3,8 @@ import {
   DataSchema,
 } from "../../types/pipeline.types.js";
 
-import { getProvider } from "../../gateway/router.js";
+import { getProviders } from "../../gateway/router.js";
+import { executeWithFallback } from "../../gateway/fallback.js";
 
 import { costService } from "../../cost/cost.service.js";
 
@@ -27,16 +28,16 @@ export class SchemaStage {
   readonly name = "Schema Generation";
 
   async execute(
-  intent: AppIntent,
-  jobId?: string
+    intent: AppIntent,
+    jobId?: string
   ): Promise<DataSchema> {
 
     console.log(
       "========== Schema Generation =========="
     );
 
-    const provider =
-      getProvider("schema");
+    const providers =
+      getProviders("schema");
 
     const defaults: DataSchema = {
 
@@ -44,29 +45,38 @@ export class SchemaStage {
 
     };
 
-    const response = await retry(() =>
-  provider.generate({
-    systemPrompt:
-      "You are a senior database architect. Return ONLY valid JSON. Never use markdown.",
+    const response =
+      await executeWithFallback(
+        providers,
+        {
 
-    userPrompt:
-      buildSchemaPrompt(intent),
+          systemPrompt:
+            "You are a senior database architect. Return ONLY valid JSON. Never use markdown.",
 
-    temperature: 0.2,
+          userPrompt:
+            buildSchemaPrompt(intent),
 
-    maxTokens: 3500,
-  })
-);
+          temperature: 0.2,
 
-costService.record(
-  jobId ?? "global",
-  "schema",
-  response.provider,
-  response.model,
-  response.latency,
-  buildSchemaPrompt(intent),
-  response.output
-);
+          maxTokens: 3500,
+
+        }
+      );
+
+    if (jobId) {
+
+  costService.record(
+    jobId,
+    "schema",
+    response.provider,
+    response.model,
+    response.latency,
+    buildSchemaPrompt(intent),
+    response.output
+  );
+
+
+}
 
     console.log(
       `Provider : ${response.provider}`

@@ -78,53 +78,57 @@ export const integrationRegistry: Integration[] = [
     ]
   },
 
+ {
+  id: "github",
+
+  name: "GitHub",
+
+  category: "developer",
+
+  description:
+    "Developer workflow integration.",
+
+  triggers: [
+    "issue.created",
+    "pull_request.opened"
+  ],
+
+  actions: [
+    "Create Issue",
+    "Comment on PR",
+    "Trigger Workflow"
+  ],
+
+  workflowTemplate: [
+    "Prepare Payload",
+    "Call GitHub API"
+  ]
+},
+
   {
-    id: "supabase",
+  id: "webhook",
 
-    name: "Supabase",
+  name: "Webhook",
 
-    category: "database",
+  category: "automation",
 
-    description:
-      "Cloud Postgres database.",
+  description:
+    "Generic outbound webhook.",
 
-    triggers: [
-      "entity.created"
-    ],
+  triggers: [
+    "entity.created",
+    "entity.updated",
+    "status.changed"
+  ],
 
-    actions: [
-      "Insert Record",
-      "Update Record"
-    ],
+  actions: [
+    "POST JSON Payload"
+  ],
 
-    workflowTemplate: [
-      "Validate",
-      "Insert"
-    ]
-  },
-
-  {
-    id: "google-drive",
-
-    name: "Google Drive",
-
-    category: "storage",
-
-    description:
-      "Cloud storage integration.",
-
-    triggers: [
-      "document.generated"
-    ],
-
-    actions: [
-      "Upload File"
-    ],
-
-    workflowTemplate: [
-      "Generate File",
-      "Upload"
-    ]
-  }
+  workflowTemplate: [
+    "Create Payload",
+    "POST Webhook"
+  ]
+}
 
 ];

@@ -1,65 +1,208 @@
-import Image from "next/image";
+"use client";
+import AnimatedGrid from "@/components/background/AnimatedGrid";
+import AuroraBackground from "@/components/background/AuroraBackground";
+import MouseGlow from "@/components/background/MouseGlow";
+
+import Navbar from "@/components/layout/Navbar";
+
+import HeroSection from "@/components/landing/HeroSection";
+import PromptCard from "@/components/landing/PromptCard";
+
+import PipelinePreview from "@/components/pipeline/PipelinePreview";
+
+import ProgressBar from "@/components/pipeline/ProgressBar";
+
+import { useGeneration } from "@/context/GenerationContext";
+
+import LiveTerminal from "@/components/pipeline/LiveTerminal";
+import ResultViewer from "@/components/results/ResultViewer";
 
 export default function Home() {
+  const {
+
+  jobId,
+
+  events,
+
+  loading,
+
+} = useGeneration();
   return (
-    <div className="flex flex-col flex-1 items-center justify-center bg-zinc-50 font-sans dark:bg-black">
-      <main className="flex flex-1 w-full max-w-3xl flex-col items-center justify-between py-32 px-16 bg-white dark:bg-black sm:items-start">
-        <Image
-          className="dark:invert"
-          src="/next.svg"
-          alt="Next.js logo"
-          width={100}
-          height={20}
-          priority
-        />
-        <div className="flex flex-col items-center gap-6 text-center sm:items-start sm:text-left">
-          <h1 className="max-w-xs text-3xl font-semibold leading-10 tracking-tight text-black dark:text-zinc-50">
-            To get started, edit the page.tsx file.
-          </h1>
-          <p className="max-w-md text-lg leading-8 text-zinc-600 dark:text-zinc-400">
-            Looking for a starting point or more instructions? Head over to{" "}
-            <a
-              href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-              className="font-medium text-zinc-950 dark:text-zinc-50"
-            >
-              Templates
-            </a>{" "}
-            or the{" "}
-            <a
-              href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-              className="font-medium text-zinc-950 dark:text-zinc-50"
-            >
-              Learning
-            </a>{" "}
-            center.
-          </p>
+    <main className="relative min-h-screen overflow-hidden bg-[#030712] text-white">
+
+      <MouseGlow />
+
+      <AnimatedGrid />
+
+      <AuroraBackground />
+
+      <Navbar />
+
+      <section className="relative z-10">
+
+  <HeroSection />
+
+  <div className="mx-auto mt-10 max-w-6xl px-6">
+
+    <PromptCard />
+
+  </div>
+
+</section>
+
+<section className="relative z-10 px-6 py-24">
+
+  <PipelinePreview />
+
+  <ProgressBar />
+
+</section>
+
+<section className="relative z-10 px-6">
+
+  <div className="mx-auto max-w-6xl">
+
+    {jobId && (
+
+      <div className="mb-6 text-cyan-400">
+
+        Job ID : {jobId}
+
+      </div>
+
+    )}
+
+    <LiveTerminal
+
+      events={events}
+
+    />
+
+  </div>
+
+</section>
+
+<section className="relative z-10 px-6 py-20">
+
+  <div className="mx-auto max-w-6xl">
+
+    {jobId && !loading && (
+
+      <ResultViewer
+
+        jobId={jobId}
+
+      />
+
+    )}
+
+  </div>
+
+</section>
+
+      <section className="relative z-10 py-24">
+
+        <div className="mx-auto grid max-w-7xl grid-cols-1 gap-8 px-6 md:grid-cols-2 xl:grid-cols-4">
+
+          <div className="rounded-3xl border border-white/10 bg-white/5 p-8 backdrop-blur-xl transition hover:-translate-y-2">
+            <p className="text-sm uppercase tracking-widest text-cyan-400">
+              Providers
+            </p>
+
+            <h2 className="mt-4 text-4xl font-bold">
+              3
+            </h2>
+
+            <p className="mt-2 text-slate-400">
+              Groq • Gemini • OpenAI
+            </p>
+          </div>
+
+          <div className="rounded-3xl border border-white/10 bg-white/5 p-8 backdrop-blur-xl transition hover:-translate-y-2">
+            <p className="text-sm uppercase tracking-widest text-violet-400">
+              Pipeline
+            </p>
+
+            <h2 className="mt-4 text-4xl font-bold">
+              6
+            </h2>
+
+            <p className="mt-2 text-slate-400">
+              Intelligent AI Stages
+            </p>
+          </div>
+
+          <div className="rounded-3xl border border-white/10 bg-white/5 p-8 backdrop-blur-xl transition hover:-translate-y-2">
+            <p className="text-sm uppercase tracking-widest text-green-400">
+              Validation
+            </p>
+
+            <h2 className="mt-4 text-4xl font-bold">
+              100%
+            </h2>
+
+            <p className="mt-2 text-slate-400">
+              Cross Layer Verification
+            </p>
+          </div>
+
+          <div className="rounded-3xl border border-white/10 bg-white/5 p-8 backdrop-blur-xl transition hover:-translate-y-2">
+            <p className="text-sm uppercase tracking-widest text-yellow-400">
+              Repair Engine
+            </p>
+
+            <h2 className="mt-4 text-4xl font-bold">
+              AI
+            </h2>
+
+            <p className="mt-2 text-slate-400">
+              Automatic JSON Recovery
+            </p>
+          </div>
+
         </div>
-        <div className="flex flex-col gap-4 text-base font-medium sm:flex-row">
-          <a
-            className="flex h-12 w-full items-center justify-center gap-2 rounded-full bg-foreground px-5 text-background transition-colors hover:bg-[#383838] dark:hover:bg-[#ccc] md:w-[158px]"
-            href="https://vercel.com/new?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            <Image
-              className="dark:invert"
-              src="/vercel.svg"
-              alt="Vercel logomark"
-              width={16}
-              height={16}
-            />
-            Deploy Now
-          </a>
-          <a
-            className="flex h-12 w-full items-center justify-center rounded-full border border-solid border-black/[.08] px-5 transition-colors hover:border-transparent hover:bg-black/[.04] dark:border-white/[.145] dark:hover:bg-[#1a1a1a] md:w-[158px]"
-            href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Documentation
-          </a>
+      </section>
+
+      <footer className="relative z-10 border-t border-white/10 py-12">
+
+        <div className="mx-auto flex max-w-7xl flex-col items-center justify-between gap-4 px-6 md:flex-row">
+
+          <div>
+
+            <h2 className="text-xl font-bold">
+
+              OneAtlas AI Engine
+
+            </h2>
+
+            <p className="mt-2 text-slate-400">
+
+              AI Native Architecture Generator
+
+            </p>
+
+          </div>
+
+          <div className="flex gap-6 text-slate-400">
+
+            <button className="transition hover:text-white">
+              GitHub
+            </button>
+
+            <button className="transition hover:text-white">
+              Docs
+            </button>
+
+            <button className="transition hover:text-white">
+              API
+            </button>
+
+          </div>
+
         </div>
-      </main>
-    </div>
+
+      </footer>
+
+    </main>
   );
 }

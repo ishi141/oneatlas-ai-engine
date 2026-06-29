@@ -5,11 +5,13 @@ export interface Integration {
   name: string;
 
   category:
-    | "communication"
-    | "database"
-    | "storage"
-    | "payment"
-    | "crm";
+  | "communication"
+  | "database"
+  | "storage"
+  | "developer"
+  | "automation"
+  | "payment"
+  | "crm";
 
   description: string;
 

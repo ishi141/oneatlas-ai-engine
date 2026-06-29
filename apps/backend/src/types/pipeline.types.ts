@@ -1,3 +1,4 @@
+import type { CostSummary } from "../cost/cost.types.js";
 export type PrimitiveType =
   | "string"
   | "number"
@@ -170,11 +171,16 @@ export interface AppSpec {
 }
 
 export interface PipelineResult {
-
   intent: AppIntent;
-
   schema: DataSchema;
-
   appSpec: AppSpec;
 
+  validation: {
+    intent: unknown;
+    schema: unknown;
+    appSpec: unknown;
+    cross: unknown;
+  };
+
+  cost: CostSummary;
 }

@@ -8,6 +8,8 @@ import { validatePipeline } from "../validators/pipeline.validator.js";
 
 import { eventService } from "../sse/event.service.js";
 
+import { costService } from "../cost/cost.service.js";
+
 export class PipelineRunner {
 
   private readonly intentStage =
@@ -138,6 +140,22 @@ export class PipelineRunner {
 
     }
 
+    if (jobId) {
+
+      eventService.send(jobId, {
+
+        type: "stage_start",
+
+        stage: "validation",
+
+        message: "Running validations",
+
+        timestamp: new Date().toISOString(),
+
+      });
+
+    }
+
     const validation =
       validatePipeline(
         intent,
@@ -157,11 +175,59 @@ export class PipelineRunner {
       )
     );
 
+    if (jobId) {
+
+      eventService.send(jobId, {
+
+        type: "stage_complete",
+
+        stage: "validation",
+
+        message: "Validation completed",
+
+        timestamp: new Date().toISOString(),
+
+      });
+
+    }
+
+    if (jobId) {
+
+      eventService.send(jobId, {
+
+        type: "stage_start",
+
+        stage: "repair",
+
+        message: "Running repair checks",
+
+        timestamp: new Date().toISOString(),
+
+      });
+
+    }
+
     if (!validation.cross.valid) {
 
       console.warn(
         "Cross layer validation failed."
       );
+
+    }
+
+    if (jobId) {
+
+      eventService.send(jobId, {
+
+        type: "stage_complete",
+
+        stage: "repair",
+
+        message: "Repair checks completed",
+
+        timestamp: new Date().toISOString(),
+
+      });
 
     }
 
@@ -181,16 +247,23 @@ export class PipelineRunner {
 
     }
 
+
+    // ...
+
+    const cost = jobId
+      ? costService.summary(jobId)
+      : {
+        totalCost: 0,
+        totalInputTokens: 0,
+        totalOutputTokens: 0,
+        totalLatency: 0,
+        entries: [],
+      };
+
     return {
-
       intent,
-
       schema,
-
       appSpec,
-
-    };
-
-  }
-
-}
+      validation,
+      cost,
+    }}};
