@@ -8,6 +8,7 @@ Built as part of the **OneAtlas AI Engineer Trial Assignment**.
 
 ### Frontend
 👉 https://oneatlas-ai-engine-frontend.vercel.app/
+---
 
 ### Backend API
 👉 https://oneatlas-ai-engine.onrender.com
