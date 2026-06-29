@@ -1,6 +1,7 @@
 import { Request, Response } from "express";
 import { generatePipeline } from "../services/pipeline.service.js";
 import { jobStore } from "../jobs/job.store.js";
+import { repairService } from "../repair/repair.service.js";
 
 export async function repairJob(
   req: Request,
@@ -8,8 +9,12 @@ export async function repairJob(
 ) {
   try {
 
-    const jobId =
-  String(req.params.jobId);
+    const jobId = String(req.params.jobId);
+
+    const {
+      stage,
+      errorHint
+    } = req.body;
 
     const job = jobStore.get(jobId);
 
@@ -22,11 +27,15 @@ export async function repairJob(
 
     }
 
-    const result =
-      await generatePipeline(
-        job.prompt,
-        jobId
-      );
+    repairService.record(
+      `Manual Repair (${stage ?? "unknown"}) ${errorHint ?? ""}`,
+      true
+    );
+
+    const result = await generatePipeline(
+      job.prompt,
+      jobId
+    );
 
     jobStore.complete(
       jobId,
@@ -38,6 +47,8 @@ export async function repairJob(
       success: true,
 
       repaired: true,
+
+      stage: stage ?? "pipeline",
 
       data: result
 

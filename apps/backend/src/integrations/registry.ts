@@ -5,25 +5,39 @@ export const integrationRegistry: Integration[] = [
   {
     id: "slack",
 
-    name: "Slack",
+    displayName: "Slack",
+
+    authType: "oauth2",
 
     category: "communication",
 
     description:
-      "Send notifications to Slack channels.",
+      "Slack notifications",
 
     triggers: [
-      "lead.created",
-      "user.created",
-      "invoice.generated"
+      "record.created",
+      "record.updated",
+      "status.changed"
     ],
 
     actions: [
-      "Send Message"
+      {
+        id: "send_message",
+        name: "Send Message",
+
+        payloadSchema: {
+          channel: "string",
+          message: "string"
+        },
+
+        outputSchema: {
+          ts: "string"
+        }
+      }
     ],
 
     workflowTemplate: [
-      "Create Payload",
+      "Prepare Payload",
       "Send Slack Message"
     ]
   },
@@ -31,20 +45,35 @@ export const integrationRegistry: Integration[] = [
   {
     id: "gmail",
 
-    name: "Gmail",
+    displayName: "Gmail",
+
+    authType: "oauth2",
 
     category: "communication",
 
     description:
-      "Send transactional emails.",
+      "Transactional Emails",
 
     triggers: [
-      "lead.created",
+      "record.created",
       "invoice.generated"
     ],
 
     actions: [
-      "Send Email"
+      {
+        id: "send_email",
+        name: "Send Email",
+
+        payloadSchema: {
+          to: "string",
+          subject: "string",
+          body: "string"
+        },
+
+        outputSchema: {
+          messageId: "string"
+        }
+      }
     ],
 
     workflowTemplate: [
@@ -56,20 +85,35 @@ export const integrationRegistry: Integration[] = [
   {
     id: "stripe",
 
-    name: "Stripe",
+    displayName: "Stripe",
+
+    authType: "api_key",
 
     category: "payment",
 
     description:
-      "Payment gateway.",
+      "Payments",
 
     triggers: [
-      "payment.requested"
+      "subscription.created",
+      "payment.completed"
     ],
 
     actions: [
-      "Create Payment",
-      "Refund"
+      {
+        id: "create_payment",
+
+        name: "Create Payment",
+
+        payloadSchema: {
+          amount: "number",
+          currency: "string"
+        },
+
+        outputSchema: {
+          paymentId: "string"
+        }
+      }
     ],
 
     workflowTemplate: [
@@ -78,57 +122,82 @@ export const integrationRegistry: Integration[] = [
     ]
   },
 
- {
-  id: "github",
+  {
+    id: "github",
 
-  name: "GitHub",
+    displayName: "GitHub",
 
-  category: "developer",
+    authType: "oauth2",
 
-  description:
-    "Developer workflow integration.",
+    category: "developer",
 
-  triggers: [
-    "issue.created",
-    "pull_request.opened"
-  ],
+    description:
+      "Developer Workflow",
 
-  actions: [
-    "Create Issue",
-    "Comment on PR",
-    "Trigger Workflow"
-  ],
+    triggers: [
+      "bug.created"
+    ],
 
-  workflowTemplate: [
-    "Prepare Payload",
-    "Call GitHub API"
-  ]
-},
+    actions: [
+      {
+        id: "create_issue",
+
+        name: "Create Issue",
+
+        payloadSchema: {
+          title: "string",
+          body: "string"
+        },
+
+        outputSchema: {
+          issueNumber: "number"
+        }
+      }
+    ],
+
+    workflowTemplate: [
+      "Prepare Issue",
+      "Create Issue"
+    ]
+  },
 
   {
-  id: "webhook",
+    id: "webhook",
 
-  name: "Webhook",
+    displayName: "Generic Webhook",
 
-  category: "automation",
+    authType: "webhook_secret",
 
-  description:
-    "Generic outbound webhook.",
+    category: "automation",
 
-  triggers: [
-    "entity.created",
-    "entity.updated",
-    "status.changed"
-  ],
+    description:
+      "Generic Webhook",
 
-  actions: [
-    "POST JSON Payload"
-  ],
+    triggers: [
+      "*"
+    ],
 
-  workflowTemplate: [
-    "Create Payload",
-    "POST Webhook"
-  ]
-}
+    actions: [
+      {
+        id: "post",
+
+        name: "POST Payload",
+
+        payloadSchema: {
+          url: "string",
+          body: "object"
+        },
+
+        outputSchema: {
+          status: "number"
+        }
+      }
+    ],
+
+    workflowTemplate: [
+      "Create Payload",
+      "POST Webhook"
+    ]
+  }
 
 ];

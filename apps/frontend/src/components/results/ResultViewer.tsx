@@ -84,31 +84,31 @@ export default function ResultViewer({
 
     const result = job?.result ?? {};
 
-const currentJson = useMemo(() => {
+    const currentJson = useMemo(() => {
 
-  switch (active) {
+        switch (active) {
 
-    case "intent":
-      return result.intent ?? {};
+            case "intent":
+                return result.intent ?? {};
 
-    case "schema":
-      return result.schema ?? {};
+            case "schema":
+                return result.schema ?? {};
 
-    case "appspec":
-      return result.appSpec ?? {};
+            case "appspec":
+                return result.appSpec ?? {};
 
-    case "validation":
-      return result.validation ?? {};
+            case "validation":
+                return result.validation ?? {};
 
-    case "cost":
-      return result.cost ?? {};
+            case "cost":
+                return result.cost ?? {};
 
-    default:
-      return {};
+            default:
+                return {};
 
-  }
+        }
 
-}, [result, active]);
+    }, [result, active]);
 
     async function copyJson() {
 
@@ -414,15 +414,18 @@ const currentJson = useMemo(() => {
                 <div className="rounded-2xl border border-white/10 bg-white/5 p-6">
 
                     <p className="text-sm uppercase tracking-widest text-green-400">
-
                         Status
-
                     </p>
 
-                    <p className="mt-3 font-semibold text-green-400">
-
-                        Completed
-
+                    <p
+                        className={`mt-3 font-semibold ${job.status === "completed"
+                            ? "text-green-400"
+                            : job.status === "failed"
+                                ? "text-red-400"
+                                : "text-yellow-400"
+                            }`}
+                    >
+                        {job.status}
                     </p>
 
                 </div>
@@ -437,9 +440,11 @@ const currentJson = useMemo(() => {
 
                     <p className="mt-3 text-sm text-slate-300">
 
-                        {job.completedAt ?? job.updatedAt
-                            ? new Date(job.generatedAt).toLocaleString()
-                            : "N/A"}
+                        job.completedAt
+                        ? new Date(job.completedAt).toLocaleString()
+                        : job.updatedAt
+                        ? new Date(job.updatedAt).toLocaleString()
+                        : "N/A"
 
                     </p>
 
@@ -519,10 +524,100 @@ const currentJson = useMemo(() => {
 
             )}
 
-            {result.cost && <CostCards cost={result.cost} />}
+            {job.repairLog?.length > 0 && (
 
-    </GlassCard>
+                <div className="mt-8 rounded-2xl border border-white/10 bg-white/5 p-6">
 
-  );
+                    <h3 className="mb-5 text-xl font-bold text-cyan-400">
+
+                        Repair History
+
+                    </h3>
+
+                    <div className="space-y-3">
+
+                        {job.repairLog.map((repair: any, index: number) => (
+
+                            <div
+                                key={index}
+                                className="flex items-center justify-between rounded-xl border border-white/10 bg-[#111827] px-5 py-4"
+                            >
+
+                                <div>
+
+                                    <p className="font-medium text-white">
+
+                                        {repair.strategy}
+
+                                    </p>
+
+                                    <p className="text-sm text-slate-400">
+
+                                        {new Date(repair.time).toLocaleString()}
+
+                                    </p>
+
+                                </div>
+
+                                <span
+                                    className={`rounded-full px-3 py-1 text-sm font-medium ${repair.success
+                                            ? "bg-green-500/20 text-green-400"
+                                            : "bg-red-500/20 text-red-400"
+                                        }`}
+                                >
+
+                                    {repair.success ? "Success" : "Failed"}
+
+                                </span>
+
+                            </div>
+
+                        ))}
+
+                    </div>
+
+                </div>
+
+            )}
+
+            {result.appSpec?.integrations?.length > 0 && (
+
+  <div className="mt-8 rounded-2xl border border-white/10 bg-white/5 p-6">
+
+    <h3 className="mb-5 text-xl font-bold text-violet-400">
+
+      Integrations Used
+
+    </h3>
+
+    <div className="flex flex-wrap gap-3">
+
+      {result.appSpec.integrations.map(
+
+        (integration: any, index: number) => (
+
+          <div
+            key={index}
+            className="rounded-full border border-violet-500/20 bg-violet-500/10 px-4 py-2 text-violet-300 transition hover:scale-105"
+          >
+
+            {integration.provider}
+
+          </div>
+
+        )
+
+      )}
+
+    </div>
+
+  </div>
+
+)}
+
+
+        </GlassCard>
+
+    );
 
 }
