@@ -5,7 +5,6 @@ import { Sparkles, ArrowRight, BrainCircuit } from "lucide-react";
 
 import GlowButton from "@/components/common/GlowButton";
 import Typewriter from "./Typewriter";
-import ScrollIndicator from "./ScrollIndicator";
 import { APP } from "@/lib/constants";
 import { fadeUp, stagger } from "@/lib/animations";
 
@@ -69,11 +68,9 @@ md:w-[450px] -translate-x-1/2 rounded-full bg-violet-600/20 blur-[140px]" />
         variants={fadeUp}
         className="
         max-w-6xl
-        text-6xl
-        font-black
-        leading-[1]
-        tracking-tight
-        text-5xl md:text-7xl xl:text-8xl
+        text-5xl
+        md:text-7xl
+        xl:text-8xl
         "
       >
         Design
@@ -121,16 +118,18 @@ md:w-[450px] -translate-x-1/2 rounded-full bg-violet-600/20 blur-[140px]" />
 
       <motion.div
         variants={fadeUp}
-      >className="
-        mt-12
-        flex
-        w-full
-        max-w-xl
-        flex-col
-        gap-4
-        sm:flex-row
-        sm:justify-center
-        "
+        className="
+          mt-12
+          flex
+          w-full
+          max-w-xl
+          flex-col
+          items-center
+          gap-4
+          sm:flex-row
+          sm:justify-center
+  "
+      >
         <div className="w-full sm:w-auto">
           <GlowButton>
             <div className="flex items-center gap-2">
@@ -208,8 +207,6 @@ md:w-[450px] -translate-x-1/2 rounded-full bg-violet-600/20 blur-[140px]" />
         grid
         w-full
         max-w-6xl
-        grid-cols-1
-        gap-6
         grid-cols-1
         gap-6
         md:grid-cols-3
@@ -395,7 +392,7 @@ md:w-[450px] -translate-x-1/2 rounded-full bg-violet-600/20 blur-[140px]" />
         </p>
       </motion.div>
 
-      <ScrollIndicator />
+      {/* <ScrollIndicator /> */}
 
     </motion.section>
   );
