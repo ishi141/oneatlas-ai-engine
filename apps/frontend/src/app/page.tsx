@@ -63,7 +63,7 @@ export default function Home() {
                   text-white
                   "
                 >
-                  Good afternoon,
+                  Greetings,
                   <span className="ml-2 text-red-500">
                     Dev User
                   </span>
