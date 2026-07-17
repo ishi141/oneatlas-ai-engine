@@ -398,4 +398,4 @@ This project is licensed under the MIT License.
 
 GitHub: https://github.com/ishi141
 
-LinkedIn: https://www.linkedin.com/in/ishika-choubey/
+LinkedIn: https://www.linkedin.com/in/ishika14/
