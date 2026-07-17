@@ -1,48 +1,68 @@
 "use client";
 
 import {
-  DollarSign,
-  ArrowDown,
-  ArrowUp,
+  CalendarDays,
+  CheckCircle2,
   Clock3,
+  Hash,
 } from "lucide-react";
 
-interface Props {
-  cost: {
-    totalCost: number;
-    totalInputTokens: number;
-    totalOutputTokens: number;
-    totalLatency: number;
-  };
+interface Job {
+  status?: string;
+  createdAt?: string;
+  updatedAt?: string;
+  completedAt?: string;
 }
 
-export default function CostCards({
-  cost,
+interface Props {
+  job: Job;
+  jobId: string;
+}
+
+export default function JobInfo({
+  job,
+  jobId,
 }: Props) {
+
+  const status = job?.status ?? "pending";
+
+  const completedAt = job?.completedAt
+    ? new Date(job.completedAt).toLocaleString()
+    : null;
+
+  const updatedAt = job?.updatedAt
+    ? new Date(job.updatedAt).toLocaleString()
+    : null;
+
+  const createdAt = job?.createdAt
+    ? new Date(job.createdAt).toLocaleString()
+    : null;
+
   const cards = [
     {
-      title: "Estimated Cost",
-      value: `$${cost.totalCost.toFixed(5)}`,
-      icon: DollarSign,
+      title: "Job ID",
+      value: jobId,
+      icon: Hash,
     },
     {
-      title: "Input Tokens",
-      value: cost.totalInputTokens.toLocaleString(),
-      icon: ArrowDown,
+      title: "Status",
+      value: status,
+      icon: CheckCircle2,
     },
     {
-      title: "Output Tokens",
-      value: cost.totalOutputTokens.toLocaleString(),
-      icon: ArrowUp,
-    },
-    {
-      title: "Latency",
-      value: `${cost.totalLatency} ms`,
+      title: "Completed",
+      value: completedAt ?? "Running",
       icon: Clock3,
+    },
+    {
+      title: "Created",
+      value: createdAt ?? updatedAt ?? "—",
+      icon: CalendarDays,
     },
   ];
 
   return (
+
     <section className="space-y-6">
 
       {/* Header */}
@@ -51,13 +71,13 @@ export default function CostCards({
 
         <h3 className="text-xl font-semibold text-white">
 
-          Execution Metrics
+          Job Details
 
         </h3>
 
         <p className="mt-2 text-sm text-zinc-500">
 
-          Resource usage collected during pipeline execution.
+          Metadata associated with the current generation.
 
         </p>
 
@@ -122,6 +142,33 @@ export default function CostCards({
 
                 </div>
 
+                {card.title === "Status" && (
+
+                  <span
+                    className={`
+                      rounded-full
+                      px-3
+                      py-1
+                      text-xs
+                      font-semibold
+                      capitalize
+
+                      ${
+                        status === "completed"
+                          ? "bg-emerald-900/20 text-emerald-400"
+                          : status === "failed"
+                          ? "bg-red-900/20 text-red-400"
+                          : "bg-amber-900/20 text-amber-400"
+                      }
+                    `}
+                  >
+
+                    {status}
+
+                  </span>
+
+                )}
+
               </div>
 
               <p className="mt-6 text-sm font-medium text-zinc-500">
@@ -130,20 +177,20 @@ export default function CostCards({
 
               </p>
 
-              <h2
+              <p
                 className="
                   mt-2
-                  break-words
-                  text-3xl
-                  font-bold
-                  tracking-tight
+                  break-all
+                  text-sm
+                  font-medium
+                  leading-6
                   text-white
                 "
               >
 
                 {card.value}
 
-              </h2>
+              </p>
 
             </div>
 
@@ -154,5 +201,7 @@ export default function CostCards({
       </div>
 
     </section>
+
   );
+
 }

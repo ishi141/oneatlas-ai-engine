@@ -1,6 +1,8 @@
 import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
+
 import "./globals.css";
+
 import { PipelineProvider } from "@/context/PipelineContext";
 import { GenerationProvider } from "@/context/GenerationContext";
 
@@ -26,23 +28,29 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en" className="dark" suppressHydrationWarning>
+    <html
+      lang="en"
+      className="dark"
+      suppressHydrationWarning
+    >
       <body
         className={`
           ${geistSans.variable}
           ${geistMono.variable}
-          bg-[#030712]
-          text-white
+          min-h-screen
+          bg-background
+          text-foreground
+          font-sans
           antialiased
-          selection:bg-violet-600
+          selection:bg-red-800
           selection:text-white
         `}
       >
         <PipelineProvider>
-    <GenerationProvider>
-        {children}
-    </GenerationProvider>
-</PipelineProvider>
+          <GenerationProvider>
+            {children}
+          </GenerationProvider>
+        </PipelineProvider>
       </body>
     </html>
   );

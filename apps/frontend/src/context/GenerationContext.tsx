@@ -1,25 +1,35 @@
 "use client";
 
+import type { PipelineEvent } from "@/types/events";
+
 import {
   createContext,
   useContext,
+  useMemo,
   useState,
   ReactNode,
+  Dispatch,
+  SetStateAction,
 } from "react";
 
-import { PipelineEvent } from "@/types/events";
-
 interface GenerationContextType {
+  prompt: string;
+  setPrompt: (value: string) => void;
+
+  provider: string;
+  setProvider: (value: string) => void;
+
   jobId: string;
-  setJobId: (id: string) => void;
+  setJobId: (value: string) => void;
 
   loading: boolean;
   setLoading: (value: boolean) => void;
 
+  error: string | null;
+  setError: (value: string | null) => void;
+
   events: PipelineEvent[];
-  setEvents: React.Dispatch<
-    React.SetStateAction<PipelineEvent[]>
-  >;
+  setEvents: Dispatch<SetStateAction<PipelineEvent[]>>;
 
   reset: () => void;
 }
@@ -32,34 +42,65 @@ export function GenerationProvider({
 }: {
   children: ReactNode;
 }) {
-  const [jobId, setJobId] = useState("");
+  const [prompt, setPrompt] = useState("");
+
+  const [provider, setProvider] =
+    useState("openai");
+
+  const [jobId, setJobId] =
+    useState("");
 
   const [loading, setLoading] =
     useState(false);
+
+  const [error, setError] =
+    useState<string | null>(null);
 
   const [events, setEvents] =
     useState<PipelineEvent[]>([]);
 
   function reset() {
+    setPrompt("");
     setJobId("");
-
     setLoading(false);
-
+    setError(null);
     setEvents([]);
   }
 
+  const value = useMemo(
+    () => ({
+      prompt,
+      setPrompt,
+
+      provider,
+      setProvider,
+
+      jobId,
+      setJobId,
+
+      loading,
+      setLoading,
+
+      error,
+      setError,
+
+      events,
+      setEvents,
+
+      reset,
+    }),
+    [
+      prompt,
+      provider,
+      jobId,
+      loading,
+      error,
+      events,
+    ]
+  );
+
   return (
-    <GenerationContext.Provider
-      value={{
-        jobId,
-        setJobId,
-        loading,
-        setLoading,
-        events,
-        setEvents,
-        reset,
-      }}
-    >
+    <GenerationContext.Provider value={value}>
       {children}
     </GenerationContext.Provider>
   );
@@ -71,7 +112,7 @@ export function useGeneration() {
 
   if (!context) {
     throw new Error(
-      "GenerationProvider missing"
+      "useGeneration must be used inside GenerationProvider"
     );
   }
 

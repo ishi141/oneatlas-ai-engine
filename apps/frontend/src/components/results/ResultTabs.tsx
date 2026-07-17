@@ -1,112 +1,85 @@
 "use client";
 
-import { FileJson, Database, LayoutDashboard, ShieldCheck, DollarSign } from "lucide-react";
-
 interface Props {
-    active: string;
-    setActive: (tab: string) => void;
+  active: string;
+  onChange: (tab: string) => void;
 }
 
 const tabs = [
-
-    {
-        key: "intent",
-        icon: FileJson,
-        label: "Intent"
-    },
-
-    {
-        key: "schema",
-        icon: Database,
-        label: "Schema"
-    },
-
-    {
-        key: "appspec",
-        icon: LayoutDashboard,
-        label: "AppSpec"
-    },
-
-    {
-        key: "validation",
-        icon: ShieldCheck,
-        label: "Validation"
-    },
-
-    {
-        key: "cost",
-        icon: DollarSign,
-        label: "Cost"
-    }
-
+  {
+    id: "intent",
+    label: "Intent",
+  },
+  {
+    id: "schema",
+    label: "Schema",
+  },
+  {
+    id: "appspec",
+    label: "App Spec",
+  },
+  {
+    id: "validation",
+    label: "Validated",
+  },
 ];
 
 export default function ResultTabs({
-
-    active,
-
-    setActive
-
+  active,
+  onChange,
 }: Props) {
+  return (
+    <div className="overflow-x-auto">
 
-    return (
+      <div
+        className="
+          inline-flex
+          min-w-max
+          gap-2
+          rounded-2xl
+          border
+          border-white/5
+          bg-[#111111]
+          p-2
+        "
+      >
 
-        <div className="mb-6 flex flex-wrap gap-3">
+        {tabs.map((tab) => {
 
-            {
+          const selected = active === tab.id;
 
-                tabs.map(tab => {
+          return (
 
-                    const Icon = tab.icon;
+            <button
+              key={tab.id}
+              onClick={() => onChange(tab.id)}
+              className={`
+                rounded-xl
+                px-5
+                py-2.5
+                text-sm
+                font-medium
+                transition-all
+                duration-300
 
-                    return (
+                ${
+                  selected
+                    ? "bg-gradient-to-r from-red-700 to-red-600 text-white shadow-lg shadow-red-900/30"
+                    : "text-zinc-400 hover:bg-[#1b1b1b] hover:text-white"
+                }
+              `}
+            >
 
-                        <button
+              {tab.label}
 
-                            key={tab.key}
+            </button>
 
-                            onClick={() => setActive(tab.key)}
+          );
 
-                            className={`
+        })}
 
-flex
-items-center
-gap-2
-rounded-xl
-px-5
-py-3
-transition
+      </div>
 
-${active === tab.key
-
-                                    ?
-
-                                    "bg-cyan-500 text-white"
-
-                                    :
-
-                                    "bg-white/5 text-slate-300 hover:bg-white/10"
-
-                                }
-
-`}
-
-                        >
-
-                            <Icon className="h-4 w-4" />
-
-                            {tab.label}
-
-                        </button>
-
-                    );
-
-                })
-
-            }
-
-        </div>
-
-    );
-
+    </div>
+  );
 }

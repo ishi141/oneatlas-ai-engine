@@ -1,208 +1,121 @@
-"use client";
-import AnimatedGrid from "@/components/background/AnimatedGrid";
-import AuroraBackground from "@/components/background/AuroraBackground";
-import MouseGlow from "@/components/background/MouseGlow";
-
-import Navbar from "@/components/layout/Navbar";
-
-import HeroSection from "@/components/landing/HeroSection";
-import PromptCard from "@/components/landing/PromptCard";
-
-import PipelinePreview from "@/components/pipeline/PipelinePreview";
-
-import ProgressBar from "@/components/pipeline/ProgressBar";
-
-import { useGeneration } from "@/context/GenerationContext";
-
-import LiveTerminal from "@/components/pipeline/LiveTerminal";
-import ResultViewer from "@/components/results/ResultViewer";
+import Sidebar from "@/components/dashboard/Sidebar";
+import Topbar from "@/components/dashboard/Topbar";
+import PromptSection from "@/components/dashboard/PromptSection";
+import ConfigCard from "@/components/dashboard/ConfigCard";
+import DashboardContent from "@/components/dashboard/DashboardContent";
 
 export default function Home() {
-  const {
-
-  jobId,
-
-  events,
-
-  loading,
-
-} = useGeneration();
   return (
-    <main className="relative min-h-screen overflow-hidden bg-[#030712] text-white">
+    <main
+      className="
+      min-h-screen
+      bg-background
+      text-foreground
+      "
+    >
+      <div className="flex min-h-screen">
 
-      <MouseGlow />
+        {/* Sidebar */}
 
-      <AnimatedGrid />
+        <aside
+          className="
+          hidden
+          lg:flex
+          lg:w-[270px]
+          lg:flex-shrink-0
+          border-r
+          border-white/5
+          bg-[#0b0b0b]/90
+          backdrop-blur-xl
+          "
+        >
+          <Sidebar />
+        </aside>
 
-      <AuroraBackground />
+        {/* Main */}
 
-      <Navbar />
+        <div className="flex min-h-screen flex-1 flex-col">
 
-      <section className="relative z-10">
+          <Topbar />
 
-  <HeroSection />
+          <div className="flex-1 overflow-y-auto">
 
-  <div className="mx-auto mt-10 max-w-6xl px-6">
+            <div
+              className="
+              mx-auto
+              w-full
+              max-w-[1650px]
+              px-8
+              py-10
+              xl:px-12
+              "
+            >
 
-    <PromptCard />
+              {/* Hero */}
 
-  </div>
+              <section className="mb-10">
 
-</section>
+                <h1
+                  className="
+                  text-4xl
+                  font-semibold
+                  tracking-tight
+                  text-white
+                  "
+                >
+                  Good afternoon,
+                  <span className="ml-2 text-red-500">
+                    Dev User
+                  </span>
+                </h1>
 
-<section className="relative z-10 px-6 py-24">
+                <p
+                  className="
+                  mt-3
+                  max-w-4xl
+                  text-[15px]
+                  leading-7
+                  text-zinc-400
+                  "
+                >
+                  Describe your application idea and let the pipeline generate
+                  a production-ready architecture, schema, application
+                  specification and validation report.
+                </p>
 
-  <PipelinePreview />
+              </section>
 
-  <ProgressBar />
+              {/* Prompt */}
 
-</section>
+              <section
+                className="
+                grid
+                gap-7
+                xl:grid-cols-[2.35fr_1fr]
+                "
+              >
 
-<section className="relative z-10 px-6">
+                <PromptSection />
 
-  <div className="mx-auto max-w-6xl">
+                <ConfigCard />
 
-    {jobId && (
+              </section>
 
-      <div className="mb-6 text-cyan-400">
+              {/* Dashboard */}
 
-        Job ID : {jobId}
+              <section className="mt-9">
+
+                <DashboardContent />
+
+              </section>
+
+            </div>
+
+          </div>
+
+        </div>
 
       </div>
-
-    )}
-
-    <LiveTerminal
-
-      events={events}
-
-    />
-
-  </div>
-
-</section>
-
-<section className="relative z-10 px-6 py-20">
-
-  <div className="mx-auto max-w-6xl">
-
-    {jobId && !loading && (
-
-      <ResultViewer
-
-        jobId={jobId}
-
-      />
-
-    )}
-
-  </div>
-
-</section>
-
-      <section className="relative z-10 py-24">
-
-        <div className="mx-auto grid max-w-7xl grid-cols-1 gap-8 px-6 md:grid-cols-2 xl:grid-cols-4">
-
-          <div className="rounded-3xl border border-white/10 bg-white/5 p-8 backdrop-blur-xl transition hover:-translate-y-2">
-            <p className="text-sm uppercase tracking-widest text-cyan-400">
-              Providers
-            </p>
-
-            <h2 className="mt-4 text-4xl font-bold">
-              3
-            </h2>
-
-            <p className="mt-2 text-slate-400">
-              Groq • Gemini • OpenAI
-            </p>
-          </div>
-
-          <div className="rounded-3xl border border-white/10 bg-white/5 p-8 backdrop-blur-xl transition hover:-translate-y-2">
-            <p className="text-sm uppercase tracking-widest text-violet-400">
-              Pipeline
-            </p>
-
-            <h2 className="mt-4 text-4xl font-bold">
-              6
-            </h2>
-
-            <p className="mt-2 text-slate-400">
-              Intelligent AI Stages
-            </p>
-          </div>
-
-          <div className="rounded-3xl border border-white/10 bg-white/5 p-8 backdrop-blur-xl transition hover:-translate-y-2">
-            <p className="text-sm uppercase tracking-widest text-green-400">
-              Validation
-            </p>
-
-            <h2 className="mt-4 text-4xl font-bold">
-              100%
-            </h2>
-
-            <p className="mt-2 text-slate-400">
-              Cross Layer Verification
-            </p>
-          </div>
-
-          <div className="rounded-3xl border border-white/10 bg-white/5 p-8 backdrop-blur-xl transition hover:-translate-y-2">
-            <p className="text-sm uppercase tracking-widest text-yellow-400">
-              Repair Engine
-            </p>
-
-            <h2 className="mt-4 text-4xl font-bold">
-              AI
-            </h2>
-
-            <p className="mt-2 text-slate-400">
-              Automatic JSON Recovery
-            </p>
-          </div>
-
-        </div>
-      </section>
-
-      <footer className="relative z-10 border-t border-white/10 py-12">
-
-        <div className="mx-auto flex max-w-7xl flex-col items-center justify-between gap-4 px-6 md:flex-row">
-
-          <div>
-
-            <h2 className="text-xl font-bold">
-
-              OneAtlas AI Engine
-
-            </h2>
-
-            <p className="mt-2 text-slate-400">
-
-              AI Native Architecture Generator
-
-            </p>
-
-          </div>
-
-          <div className="flex gap-6 text-slate-400">
-
-            <button className="transition hover:text-white">
-              GitHub
-            </button>
-
-            <button className="transition hover:text-white">
-              Docs
-            </button>
-
-            <button className="transition hover:text-white">
-              API
-            </button>
-
-          </div>
-
-        </div>
-
-      </footer>
-
     </main>
   );
 }

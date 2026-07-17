@@ -2,622 +2,219 @@
 
 import { useEffect, useMemo, useState } from "react";
 
-import {
-    Copy,
-    Download,
-    Check,
-    FileJson,
-    Database,
-    LayoutDashboard,
-    ShieldCheck,
-    DollarSign,
-} from "lucide-react";
-
-import { JsonView, allExpanded } from "react-json-view-lite";
-import "react-json-view-lite/dist/index.css";
-
-import GlassCard from "@/components/common/GlassCard";
-import GlowButton from "@/components/common/GlowButton";
-
 import { getJob } from "@/services/job";
 
+import ResultHeader from "./ResultHeader";
 import ResultTabs from "./ResultTabs";
-
+import JsonPanel from "./JsonPanel";
+import JobInfo from "./JobInfo";
 import CostCards from "./CostCards";
+import RepairHistory from "./RepairHistory";
+import IntegrationList from "./IntegrationList";
 
 interface Props {
-    jobId: string;
+  jobId: string;
 }
 
 type TabType =
-    | "intent"
-    | "schema"
-    | "appspec"
-    | "validation"
-    | "cost";
+  | "intent"
+  | "schema"
+  | "appspec"
+  | "validation"
+  | "cost";
 
 export default function ResultViewer({
-    jobId,
+  jobId,
 }: Props) {
 
-    const [loading, setLoading] =
-        useState(true);
+  const [loading, setLoading] = useState(true);
 
-    const [copied, setCopied] =
-        useState(false);
+  interface JobResponse {
+    data: {
+      status: string;
+      cost?: {
+        totalCost: number;
+        totalInputTokens: number;
+        totalOutputTokens: number;
+        totalLatency: number;
+      };
+      result: Record<string, unknown>;
+      repairLog?: unknown[];
+      createdAt?: string;
+      updatedAt?: string;
+      completedAt?: string;
+    };
+  }
 
-    const [job, setJob] =
-        useState<any>(null);
+  const [job, setJob] =
+    useState<JobResponse["data"] | null>(null);
 
-    const [active, setActive] =
+  const [copied, setCopied] = useState(false);
 
-        useState("intent");
+  const [active, setActive] =
+    useState<TabType>("intent");
 
-    useEffect(() => {
+  useEffect(() => {
 
-        async function load() {
+    async function load() {
 
-            try {
+      try {
 
-                const data =
-                    await getJob(jobId);
+        const data = await getJob(jobId);
 
-                setJob(data.data);
+        setJob(data.data);
 
-            }
+      } catch (err) {
 
-            finally {
+        console.error(err);
 
-                setLoading(false);
+      } finally {
 
-            }
+        setLoading(false);
 
-        }
-
-        if (jobId) {
-
-            load();
-
-        }
-
-    }, [jobId]);
-
-    const result = job?.result ?? {};
-
-    const currentJson = useMemo(() => {
-
-        switch (active) {
-
-            case "intent":
-                return result.intent ?? {};
-
-            case "schema":
-                return result.schema ?? {};
-
-            case "appspec":
-                return result.appSpec ?? {};
-
-            case "validation":
-                return result.validation ?? {};
-
-            case "cost":
-                return result.cost ?? {};
-
-            default:
-                return {};
-
-        }
-
-    }, [result, active]);
-
-    async function copyJson() {
-
-        await navigator.clipboard.writeText(
-            JSON.stringify(
-                currentJson,
-                null,
-                2
-            )
-        );
-
-        setCopied(true);
-
-        setTimeout(() => {
-
-            setCopied(false);
-
-        }, 2000);
+      }
 
     }
 
-    function downloadJson() {
+    if (jobId) load();
 
-        const blob =
-            new Blob(
+  }, [jobId]);
 
-                [
-                    JSON.stringify(
-                        currentJson,
-                        null,
-                        2
-                    ),
-                ],
+  const result: any = job?.result ?? {};
 
-                {
-                    type: "application/json",
-                }
+  const currentJson = useMemo(() => {
 
-            );
+    switch (active) {
 
-        const url =
-            URL.createObjectURL(blob);
+      case "intent":
+        return result.intent ?? {};
 
-        const a =
-            document.createElement("a");
+      case "schema":
+        return result.schema ?? {};
 
-        a.href = url;
+      case "appspec":
+        return result.appSpec ?? {};
 
-        a.download =
-            `${active}.json`;
+      case "validation":
+        return result.validation ?? {};
 
-        a.click();
+      case "cost":
+        return result.cost ?? {};
 
-        URL.revokeObjectURL(url);
+      default:
+        return {};
 
     }
 
-    if (loading) {
+  }, [active, result]);
 
-        return (
-
-            <GlassCard className="mt-16 p-8">
-
-                <p className="text-center text-slate-400">
-
-                    Loading generation...
-
-                </p>
-
-            </GlassCard>
-
-        );
-
-    }
-
-    if (!job) {
-
-        return (
-
-            <GlassCard className="mt-16 p-8">
-
-                <p className="text-center text-red-400">
-
-                    Failed to load generation.
-
-                </p>
-
-            </GlassCard>
-
-        );
-
-    }
-
-    const tabs = [
-
-        {
-            key: "intent",
-            icon: FileJson,
-            label: "Intent",
-        },
-
-        {
-            key: "schema",
-            icon: Database,
-            label: "Schema",
-        },
-
-        {
-            key: "appspec",
-            icon: LayoutDashboard,
-            label: "AppSpec",
-        },
-
-        {
-            key: "validation",
-            icon: ShieldCheck,
-            label: "Validation",
-        },
-
-        {
-            key: "cost",
-            icon: DollarSign,
-            label: "Cost",
-        },
-
-    ] as const;
+  if (loading) {
 
     return (
 
-        <GlassCard className="mt-20 p-8">
+      <div className="flex h-[500px] items-center justify-center">
 
-            <div className="mb-8 flex items-center justify-between">
+        <div className="text-center">
 
-                <div>
+          <div className="mx-auto mb-6 h-10 w-10 animate-spin rounded-full border-4 border-zinc-700 border-t-red-600" />
 
-                    <h2 className="text-3xl font-bold">
+          <h3 className="text-lg font-semibold text-white">
 
-                        <p className="mb-2 text-cyan-400">
+            Loading Results...
 
-                            Pipeline Output
+          </h3>
 
-                        </p>
+          <p className="mt-2 text-sm text-zinc-500">
 
-                        Generation Result
+            Fetching generated architecture.
 
-                    </h2>
+          </p>
 
-                    <p className="mt-2 text-slate-400">
+        </div>
 
-                        Inspect every pipeline layer.
+      </div>
 
-                    </p>
+    );
 
-                </div>
+  }
 
-                <div className="flex gap-3">
+  if (!job) {
 
-                    <GlowButton
-                        onClick={copyJson}
-                    >
+    return (
 
-                        {copied ? (
+      <div className="flex h-[500px] items-center justify-center">
 
-                            <>
+        <div className="text-center">
 
-                                <Check
-                                    className="mr-2 h-4 w-4"
-                                />
+          <h3 className="text-xl font-semibold text-red-400">
 
-                                Copied
+            Unable to load generation
 
-                            </>
+          </h3>
 
-                        ) : (
+          <p className="mt-2 text-sm text-zinc-500">
 
-                            <>
+            Please try generating again.
 
-                                <Copy
-                                    className="mr-2 h-4 w-4"
-                                />
+          </p>
 
-                                Copy
+        </div>
 
-                            </>
+      </div>
 
-                        )}
+    );
 
-                    </GlowButton>
+  }
 
-                    <GlowButton
-                        onClick={downloadJson}
-                    >
+  return (
 
-                        <Download
-                            className="mr-2 h-4 w-4"
-                        />
+    <div className="space-y-8">
 
-                        Download
+      <ResultHeader
+        copied={copied}
+        active={active}
+        currentJson={currentJson}
+        setCopied={setCopied}
+      />
 
-                    </GlowButton>
+      <ResultTabs
+        active={active}
+        onChange={(value: string) =>
+          setActive(value as TabType)
+        }
+      />
 
-                </div>
+      <JsonPanel
+        active={active}
+        currentJson={currentJson}
+      />
 
-            </div>
+      <JobInfo
+        job={job}
+        jobId={jobId}
+      />
 
-            <div className="mb-8 flex flex-wrap gap-3">
-
-                <ResultTabs
-
-                    active={active}
-
-                    setActive={setActive}
-
-                />
-
-            </div>
-            <div
-                className="
-        overflow-hidden
-        rounded-2xl
-        border
-        border-white/10
-        bg-[#0b1120]
-        "
-            >
-                <div
-                    className="
-          flex
-          items-center
-          justify-between
-          border-b
-          border-white/10
-          px-6
-          py-4
-          "
-                >
-                    <div>
-
-                        <h3 className="text-lg font-semibold">
-
-                            {active.charAt(0).toUpperCase() + active.slice(1)}
-
-                        </h3>
-
-                        <p className="mt-1 text-sm text-slate-400">
-
-                            JSON Output
-
-                        </p>
-
-                    </div>
-
-                    <div className="rounded-lg bg-cyan-500/10 px-3 py-1 text-xs text-cyan-300">
-
-                        {active.toUpperCase()}
-
-                    </div>
-
-                </div>
-
-                <div className="max-h-[700px] overflow-auto p-6">
-
-                    <div
-
-                        key={active}
-
-                        className="animate-in fade-in duration-500"
-
-                    >
-
-                        <JsonView
-
-                            data={currentJson}
-
-                            shouldExpandNode={allExpanded}
-
-                        />
-
-                    </div>
-
-                </div>
-
-            </div>
-
-            <div className="mt-8 grid gap-6 md:grid-cols-3">
-
-                <div className="rounded-2xl border border-white/10 bg-white/5 p-6">
-
-                    <p className="text-sm uppercase tracking-widest text-cyan-400">
-
-                        Job ID
-
-                    </p>
-
-                    <p className="mt-3 break-all text-sm text-slate-300">
-
-                        {jobId}
-
-                    </p>
-
-                </div>
-
-                <div className="rounded-2xl border border-white/10 bg-white/5 p-6">
-
-                    <p className="text-sm uppercase tracking-widest text-green-400">
-                        Status
-                    </p>
-
-                    <p
-                        className={`mt-3 font-semibold ${job.status === "completed"
-                            ? "text-green-400"
-                            : job.status === "failed"
-                                ? "text-red-400"
-                                : "text-yellow-400"
-                            }`}
-                    >
-                        {job.status}
-                    </p>
-
-                </div>
-
-                <div className="rounded-2xl border border-white/10 bg-white/5 p-6">
-
-                    <p className="text-sm uppercase tracking-widest text-violet-400">
-
-                        Generated At
-
-                    </p>
-
-                    <p className="mt-3 text-sm text-slate-300">
-
-                        job.completedAt
-                        ? new Date(job.completedAt).toLocaleString()
-                        : job.updatedAt
-                        ? new Date(job.updatedAt).toLocaleString()
-                        : "N/A"
-
-                    </p>
-
-                </div>
-
-            </div>
-
-            {job.cost && (
-
-                <div className="mt-8 grid gap-6 md:grid-cols-4">
-
-                    <div className="rounded-2xl border border-white/10 bg-white/5 p-5">
-
-                        <p className="text-xs uppercase text-slate-400">
-
-                            Total Cost
-
-                        </p>
-
-                        <h3 className="mt-2 text-2xl font-bold">
-
-                            ${Number(job.cost.totalCost ?? 0).toFixed(5)}
-
-                        </h3>
-
-                    </div>
-
-                    <div className="rounded-2xl border border-white/10 bg-white/5 p-5">
-
-                        <p className="text-xs uppercase text-slate-400">
-
-                            Input Tokens
-
-                        </p>
-
-                        <h3 className="mt-2 text-2xl font-bold">
-
-                            {job.cost.totalInputTokens}
-
-                        </h3>
-
-                    </div>
-
-                    <div className="rounded-2xl border border-white/10 bg-white/5 p-5">
-
-                        <p className="text-xs uppercase text-slate-400">
-
-                            Output Tokens
-
-                        </p>
-
-                        <h3 className="mt-2 text-2xl font-bold">
-
-                            {job.cost.totalOutputTokens}
-
-                        </h3>
-
-                    </div>
-
-                    <div className="rounded-2xl border border-white/10 bg-white/5 p-5">
-
-                        <p className="text-xs uppercase text-slate-400">
-
-                            Latency
-
-                        </p>
-
-                        <h3 className="mt-2 text-2xl font-bold">
-
-                            {job.cost.totalLatency} ms
-
-                        </h3>
-
-                    </div>
-
-                </div>
-
-            )}
-
-            {job.repairLog?.length > 0 && (
-
-                <div className="mt-8 rounded-2xl border border-white/10 bg-white/5 p-6">
-
-                    <h3 className="mb-5 text-xl font-bold text-cyan-400">
-
-                        Repair History
-
-                    </h3>
-
-                    <div className="space-y-3">
-
-                        {job.repairLog.map((repair: any, index: number) => (
-
-                            <div
-                                key={index}
-                                className="flex items-center justify-between rounded-xl border border-white/10 bg-[#111827] px-5 py-4"
-                            >
-
-                                <div>
-
-                                    <p className="font-medium text-white">
-
-                                        {repair.strategy}
-
-                                    </p>
-
-                                    <p className="text-sm text-slate-400">
-
-                                        {new Date(repair.time).toLocaleString()}
-
-                                    </p>
-
-                                </div>
-
-                                <span
-                                    className={`rounded-full px-3 py-1 text-sm font-medium ${repair.success
-                                            ? "bg-green-500/20 text-green-400"
-                                            : "bg-red-500/20 text-red-400"
-                                        }`}
-                                >
-
-                                    {repair.success ? "Success" : "Failed"}
-
-                                </span>
-
-                            </div>
-
-                        ))}
-
-                    </div>
-
-                </div>
-
-            )}
-
-            {result.appSpec?.integrations?.length > 0 && (
-
-  <div className="mt-8 rounded-2xl border border-white/10 bg-white/5 p-6">
-
-    <h3 className="mb-5 text-xl font-bold text-violet-400">
-
-      Integrations Used
-
-    </h3>
-
-    <div className="flex flex-wrap gap-3">
-
-      {result.appSpec.integrations.map(
-
-        (integration: any, index: number) => (
-
-          <div
-            key={index}
-            className="rounded-full border border-violet-500/20 bg-violet-500/10 px-4 py-2 text-violet-300 transition hover:scale-105"
-          >
-
-            {integration.provider}
-
-          </div>
-
-        )
-
+      {job.cost && (
+        <CostCards cost={job.cost} />
       )}
+
+      <RepairHistory
+        repairLog={
+          (job?.repairLog ??
+            job?.result?.repairLog ??
+            []) as any[]
+        }
+      />
+
+      <IntegrationList
+        integrations={
+          ((result as any).appSpec?.integrations ??
+            []) as any[]
+        }
+      />
 
     </div>
 
-  </div>
-
-)}
-
-
-        </GlassCard>
-
-    );
+  );
 
 }

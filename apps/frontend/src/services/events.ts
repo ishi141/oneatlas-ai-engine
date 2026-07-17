@@ -1,45 +1,22 @@
 import { API_URL } from "./api";
 
+import type { PipelineEvent } from "@/types/events";
+
 export function connectEvents(
-
-    jobId: string,
-
-    onMessage: (data: any) => void
-
+  jobId: string,
+  onMessage: (data: PipelineEvent) => void
 ) {
+  const eventSource = new EventSource(
+    `${API_URL}/events/${jobId}`
+  );
 
-    const eventSource =
+  eventSource.onmessage = (event) => {
+    onMessage(JSON.parse(event.data));
+  };
 
-        new EventSource(
+  eventSource.onerror = () => {
+    eventSource.close();
+  };
 
-            `${API_URL}/events/${jobId}`
-
-        );
-
-    eventSource.onmessage = (
-
-        event
-
-    ) => {
-
-        const parsed =
-
-            JSON.parse(
-
-                event.data
-
-            );
-
-        onMessage(parsed);
-
-    };
-
-    eventSource.onerror = () => {
-
-        eventSource.close();
-
-    };
-
-    return eventSource;
-
+  return eventSource;
 }
